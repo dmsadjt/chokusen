@@ -75,13 +75,16 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     }
 
     @Override
-    public void addUserToWorkspace(UUID workspaceId, UUID userId) {
-        WorkspaceMember member = createMember(workspaceId, userId);
-
+    public void addUserToWorkspace(UUID workspaceId, UUID userId, String role) {
+        WorkspaceMember member = createMember(workspaceId, userId, role);
         workspaceMemberRepository.save(member);
     }
 
-    private WorkspaceMember createMember(UUID workspaceId, UUID userId) {
+    private WorkspaceMember createMember(
+        UUID workspaceId,
+        UUID userId,
+        String role
+    ) {
         Workspace workspace = workspaceRepository
             .findById(workspaceId)
             .orElseThrow(() -> new RuntimeException("Workspace not found"));
@@ -90,11 +93,16 @@ public class WorkspaceServiceImpl implements WorkspaceService {
             .findById(userId)
             .orElseThrow(() -> new RuntimeException("User not found"));
 
+        WorkspaceMemberId id = new WorkspaceMemberId();
+        id.setWorkspaceId(workspaceId);
+        id.setUserId(userId);
+
         WorkspaceMember member = new WorkspaceMember();
+        member.setId(id);
         member.setWorkspace(workspace);
         member.setUser(user);
         member.setDateJoined(LocalDateTime.now());
-        member.setRole("member");
+        member.setRole(role);
         return member;
     }
 
