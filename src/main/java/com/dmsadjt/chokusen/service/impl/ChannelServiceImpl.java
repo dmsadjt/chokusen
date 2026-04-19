@@ -113,4 +113,11 @@ public class ChannelServiceImpl implements ChannelService {
             );
         channelMemberRepository.delete(channelMember);
     }
+
+    @Override
+    public Channel getChannelById(UUID id) {
+        return channelRepository
+            .findById(id)
+            .orElseThrow(() -> new RuntimeException("Channel not found"));
+    }
 }
