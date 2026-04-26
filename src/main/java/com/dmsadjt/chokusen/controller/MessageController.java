@@ -5,6 +5,7 @@ import com.dmsadjt.chokusen.service.MessageService;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,24 +22,30 @@ public class MessageController {
     private MessageService messageService;
 
     @GetMapping(path = "/channels/{channelId}/messages")
-    public List<Message> getAllMessages(@PathVariable UUID channelId) {
-        return messageService.getMessagesInChannel(channelId);
+    public ResponseEntity<List<Message>> getAllMessages(
+        @PathVariable UUID channelId
+    ) {
+        return ResponseEntity.ok(
+            messageService.getMessagesInChannel(channelId)
+        );
     }
 
     @PutMapping(path = "/channels/{channelId}/messages/{messageId}")
-    public void editMessage(
+    public ResponseEntity<Void> editMessage(
         @PathVariable UUID channelId,
         @PathVariable UUID messageId,
         @RequestBody Message message
     ) {
         messageService.editMessage(messageId, message);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping(path = "/channels/{channelId}/messages/{messageId}")
-    public void deleteMessage(
+    public ResponseEntity<Void> deleteMessage(
         @PathVariable UUID channelId,
         @PathVariable UUID messageId
     ) {
         messageService.deleteMessage(messageId);
+        return ResponseEntity.noContent().build();
     }
 }

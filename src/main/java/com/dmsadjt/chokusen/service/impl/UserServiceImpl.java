@@ -28,12 +28,27 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void updateUser(UUID userId, User user) {
-        user.setUserId(userId);
-        userRepository.save(user);
+        User existingUser = userRepository
+            .findById(userId)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+        existingUser.setEmail(user.getEmail());
+        existingUser.setPassword(user.getPassword());
+        existingUser.setUsername(user.getUsername());
+        userRepository.save(existingUser);
     }
 
     @Override
     public void deleteUser(UUID id) {
         userRepository.deleteById(id);
+    }
+
+    @Override
+    public User createUser(User user) {
+        return userRepository.save(user);
+    }
+
+    @Override
+    public User getUserByUsername(String username) {
+        return userRepository.findByUsername(username);
     }
 }
