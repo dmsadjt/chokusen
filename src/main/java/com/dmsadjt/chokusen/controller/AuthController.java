@@ -5,6 +5,7 @@ import com.dmsadjt.chokusen.dto.RegisterRequest;
 import com.dmsadjt.chokusen.entity.User;
 import com.dmsadjt.chokusen.security.JwtUtil;
 import com.dmsadjt.chokusen.service.UserService;
+import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -52,6 +53,7 @@ public class AuthController {
         User newUser = new User();
         newUser.setUsername(registerRequest.getUsername());
         newUser.setEmail(registerRequest.getEmail());
+        newUser.setCreatedAt(LocalDateTime.now());
         newUser.setPassword(
             passwordEncoder.encode(registerRequest.getPassword())
         );
