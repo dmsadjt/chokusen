@@ -5,6 +5,7 @@ import com.dmsadjt.chokusen.service.UserService;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,22 +22,27 @@ public class UserController {
     private UserService userService;
 
     @GetMapping(path = "/users")
-    public List<User> getAllUsers() {
-        return userService.getAllUsers();
+    public ResponseEntity<List<User>> getAllUsers() {
+        return ResponseEntity.ok(userService.getAllUsers());
     }
 
     @GetMapping(path = "/users/{userId}")
-    public User getUserById(@PathVariable UUID userId) {
-        return userService.getUserById(userId);
+    public ResponseEntity<User> getUserById(@PathVariable UUID userId) {
+        return ResponseEntity.ok(userService.getUserById(userId));
     }
 
     @PutMapping(path = "/users/{userId}")
-    public void saveUser(@PathVariable UUID userId, @RequestBody User user) {
+    public ResponseEntity<Void> updateUser(
+        @PathVariable UUID userId,
+        @RequestBody User user
+    ) {
         userService.updateUser(userId, user);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping(path = "/users/{userId}")
-    public void deleteUser(@PathVariable UUID userId) {
+    public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
         userService.deleteUser(userId);
+        return ResponseEntity.noContent().build();
     }
 }
