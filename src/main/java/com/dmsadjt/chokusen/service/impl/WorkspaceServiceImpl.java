@@ -41,6 +41,8 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     @Override
     public Workspace createWorkspace(Workspace workspace) {
+        workspace.setCreatedAt(LocalDateTime.now());
+        workspace.setUpdatedAt(LocalDateTime.now());
         return workspaceRepository.save(workspace);
     }
 

@@ -33,6 +33,19 @@ public class ChannelServiceImpl implements ChannelService {
 
     @Override
     public Channel createChannel(Channel channel) {
+        channel.setCreatedAt(LocalDateTime.now());
+        channel.setUpdatedAt(LocalDateTime.now());
+        return channelRepository.save(channel);
+    }
+
+    @Override
+    public Channel createChannelInWorkspace(UUID workspaceId, Channel channel) {
+        Workspace workspace = workspaceRepository
+            .findById(workspaceId)
+            .orElseThrow(() -> new RuntimeException("Workspace not found"));
+        channel.setCreatedAt(LocalDateTime.now());
+        channel.setUpdatedAt(LocalDateTime.now());
+        channel.setWorkspace(workspace);
         return channelRepository.save(channel);
     }
 

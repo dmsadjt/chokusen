@@ -53,10 +53,13 @@ public class ChannelController {
         return ResponseEntity.ok(channelService.getUsersInChannel(channelId));
     }
 
-    @PostMapping(path = "/channels")
-    public ResponseEntity<Channel> createChannel(@RequestBody Channel channel) {
+    @PostMapping(path = "/workspaces/{workspaceId}/channels")
+    public ResponseEntity<Channel> createChannelInWorkspace(
+        @PathVariable UUID workspaceId,
+        @RequestBody Channel channel
+    ) {
         return ResponseEntity.status(HttpStatus.CREATED).body(
-            channelService.createChannel(channel)
+            channelService.createChannelInWorkspace(workspaceId, channel)
         );
     }
 

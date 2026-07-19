@@ -38,3 +38,5 @@ out/
 
 ### Local ###
 application-local.properties
+
+.claude/
