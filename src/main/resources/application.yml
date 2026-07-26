@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: chokusen
+  datasource:
+    url: jdbc:postgresql://localhost:5432/chokusen
+    username: postgres
+    password: changeme
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    open-in-view: false
+  profiles:
+    active: local
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+
+app:
+  jwt:
+    secret: changeme
+    expiration: 86400000
+  security:
+    public-endpoints:
+      - /api/v1/auth/**
+      - /error
+      - /ws/**
+      - /api/v1/health
+      - /swagger-ui/**
+      - /swagger-ui.html
+      - /v3/api-docs/**
