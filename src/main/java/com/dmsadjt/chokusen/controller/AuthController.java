@@ -7,7 +7,10 @@ import com.dmsadjt.chokusen.security.JwtUtil;
 import com.dmsadjt.chokusen.service.UserService;
 import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,8 +31,11 @@ public class AuthController {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
+    @Value("${app.jwt.expiration}")
+    private long jwtExpirationMs;
+
     @PostMapping(path = "/auth/login")
-    public ResponseEntity<String> login(
+    public ResponseEntity<Void> login(
         @RequestBody LoginRequest loginRequest
     ) {
         User user = userService.getUserByUsername(loginRequest.getUsername());
@@ -43,7 +49,16 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
         String token = jwtUtil.generateToken(loginRequest.getUsername());
-        return ResponseEntity.ok(token);
+        ResponseCookie cookie = ResponseCookie.from("token", token)
+            .httpOnly(true)
+            .secure(true)
+            .sameSite("Strict")
+            .path("/")
+            .maxAge(jwtExpirationMs / 1000)
+            .build();
+        return ResponseEntity.ok()
+            .header(HttpHeaders.SET_COOKIE, cookie.toString())
+            .build();
     }
 
     @PostMapping(path = "/auth/register")

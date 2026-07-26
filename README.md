@@ -19,15 +19,29 @@ A real-time collaborative messaging API built with Spring Boot. Organize convers
 - PostgreSQL running on `localhost:5432`
 - A database named `chokusen`
 
-## Getting Started
+## Installation
 
-1. **Clone the repository**
+### macOS
+
+1. **Install Java 21**
+   ```bash
+   brew install openjdk@21
+   sudo ln -sfn /opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk-21.jdk
+   java -version
+   ```
+
+2. **Install PostgreSQL**
+   ```bash
+   brew install postgresql@16
+   brew services start postgresql@16
+   createdb chokusen
+   ```
+
+3. **Clone and configure the project**
    ```bash
    git clone <repo-url>
    cd chokusen
    ```
-
-2. **Configure the application**
 
    Open `src/main/resources/application.properties` and set your values:
    ```properties
@@ -37,20 +51,62 @@ A real-time collaborative messaging API built with Spring Boot. Organize convers
    jwt.secret=<your-secret-key>
    ```
 
-3. **Run the application**
+4. **Run the application**
    ```bash
    ./gradlew bootRun
    ```
 
    The API will be available at `http://localhost:8080`.
 
-   Hibernate will auto-create/update the schema on startup (`ddl-auto=update`).
+### Windows
+
+1. **Install Java 21**
+
+   Download and install the [Eclipse Temurin 21 JDK](https://adoptium.net/temurin/releases/?version=21) (or `winget install EclipseAdoptium.Temurin.21.JDK` in PowerShell), then verify:
+   ```powershell
+   java -version
+   ```
+
+2. **Install PostgreSQL**
+
+   Download and install [PostgreSQL 16](https://www.postgresql.org/download/windows/), or via winget:
+   ```powershell
+   winget install PostgreSQL.PostgreSQL.16
+   ```
+
+   Then create the database (using the `psql` shell or pgAdmin):
+   ```powershell
+   psql -U postgres -c "CREATE DATABASE chokusen;"
+   ```
+
+3. **Clone and configure the project**
+   ```powershell
+   git clone <repo-url>
+   cd chokusen
+   ```
+
+   Open `src/main/resources/application.properties` and set your values:
+   ```properties
+   spring.datasource.url=jdbc:postgresql://localhost:5432/chokusen
+   spring.datasource.username=<your-db-user>
+   spring.datasource.password=<your-db-password>
+   jwt.secret=<your-secret-key>
+   ```
+
+4. **Run the application**
+   ```powershell
+   .\gradlew.bat bootRun
+   ```
+
+   The API will be available at `http://localhost:8080`.
+
+Hibernate will auto-create/update the schema on startup (`ddl-auto=update`) on either platform.
 
 ## Authentication
 
 All endpoints except `/api/v1/auth/**` require a valid JWT token.
 
-Include the token in every request header:
+On login, the token is set as an `httpOnly` cookie (`token`), so browser clients are authenticated automatically on subsequent requests — no extra header needed. Non-browser clients can alternatively send the token manually:
 ```
 Authorization: Bearer <token>
 ```
@@ -78,7 +134,7 @@ Content-Type: application/json
 }
 ```
 
-Returns a JWT token valid for 24 hours.
+Sets an `httpOnly` cookie containing a JWT valid for 24 hours.
 
 ## API Reference
 
