@@ -40,3 +40,4 @@ out/
 application-local.properties
 
 .claude/
+src/main/resources/application-local.yml
