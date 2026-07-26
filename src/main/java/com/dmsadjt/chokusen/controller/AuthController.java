@@ -3,6 +3,7 @@ package com.dmsadjt.chokusen.controller;
 import com.dmsadjt.chokusen.dto.LoginRequest;
 import com.dmsadjt.chokusen.dto.RegisterRequest;
 import com.dmsadjt.chokusen.entity.User;
+import com.dmsadjt.chokusen.security.AuthErrorCode;
 import com.dmsadjt.chokusen.security.JwtUtil;
 import com.dmsadjt.chokusen.service.UserService;
 import java.time.LocalDateTime;
@@ -35,7 +36,7 @@ public class AuthController {
     private long jwtExpirationMs;
 
     @PostMapping(path = "/auth/login")
-    public ResponseEntity<Void> login(
+    public ResponseEntity<?> login(
         @RequestBody LoginRequest loginRequest
     ) {
         User user = userService.getUserByUsername(loginRequest.getUsername());
@@ -46,12 +47,12 @@ public class AuthController {
                 user.getPassword()
             )
         ) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(AuthErrorCode.INVALID_CREDENTIALS);
         }
         String token = jwtUtil.generateToken(loginRequest.getUsername());
         ResponseCookie cookie = ResponseCookie.from("token", token)
             .httpOnly(true)
-            .secure(true)
+            .secure(false) //change when going prod
             .sameSite("Strict")
             .path("/")
             .maxAge(jwtExpirationMs / 1000)

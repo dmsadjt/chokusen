@@ -2,6 +2,7 @@ package com.dmsadjt.chokusen.security;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,6 +18,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+    @Autowired
+    private SecurityProperties securityProperties;
 
     @Autowired
     private JwtFilter jwtFilter;
@@ -57,7 +60,7 @@ public class SecurityConfig {
         );
         http.authorizeHttpRequests(auth ->
             auth
-                .requestMatchers("/api/v1/auth/**", "/error", "/ws/**", "/api/v1/health")
+                .requestMatchers(securityProperties.getPublicEndpoints().toArray(new String[0]))
                 .permitAll()
                 .anyRequest()
                 .authenticated()
