@@ -1,5 +1,6 @@
 package com.dmsadjt.chokusen.repository;
 
+import com.dmsadjt.chokusen.entity.User;
 import com.dmsadjt.chokusen.entity.Workspace;
 import com.dmsadjt.chokusen.entity.WorkspaceMember;
 import com.dmsadjt.chokusen.entity.WorkspaceMemberId;
@@ -12,4 +13,5 @@ public interface WorkspaceMemberRepository
     extends JpaRepository<WorkspaceMember, WorkspaceMemberId>
 {
     public List<WorkspaceMember> findByWorkspace(Workspace workspace);
+    public List<WorkspaceMember> findByUser(User user);
 }

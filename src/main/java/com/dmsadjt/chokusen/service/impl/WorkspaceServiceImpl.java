@@ -114,6 +114,17 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         workspaceMemberRepository.delete(member);
     }
 
+    @Override
+    public List<Workspace> getWorkspacesForUsername(String username) {
+        User user = userRepository.findByUsername(username);
+
+        List<WorkspaceMember> workspaces = workspaceMemberRepository.findByUser(user);
+        return workspaces
+                .stream()
+                .map(WorkspaceMember::getWorkspace)
+                .collect(Collectors.toList());
+    }
+
     private WorkspaceMember getMember(UUID workspaceId, UUID userId) {
         WorkspaceMemberId id = new WorkspaceMemberId();
         id.setWorkspaceId(workspaceId);

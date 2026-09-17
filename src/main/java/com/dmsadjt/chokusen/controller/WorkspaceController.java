@@ -9,6 +9,8 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -47,6 +49,18 @@ public class WorkspaceController {
             workspaceService.getUsersInWorkspace(workspaceId)
         );
     }
+
+    @GetMapping(path = "/workspaces/mine")
+    public ResponseEntity<List<Workspace>> getUsersWorkspace() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        assert auth != null;
+        String username = auth.getName();
+        return ResponseEntity.ok(
+                workspaceService.getWorkspacesForUsername(username)
+        );
+    }
+
+
 
     @PostMapping(path = "/workspaces")
     public ResponseEntity<Workspace> createWorkspace(

@@ -14,4 +14,5 @@ public interface WorkspaceService {
     List<User> getUsersInWorkspace(UUID workspaceId);
     void addUserToWorkspace(UUID workspaceId, UUID userId, String role);
     void removeUserFromWorkspace(UUID workspaceId, UUID userId);
+    List<Workspace> getWorkspacesForUsername(String username);
 }
