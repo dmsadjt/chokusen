@@ -55,15 +55,27 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(AuthErrorCode.INVALID_CREDENTIALS);
         }
         String token = jwtUtil.generateToken(loginRequest.getUsername());
-        ResponseCookie cookie = ResponseCookie.from("token", token)
+        ResponseCookie cookie = tokenCookie(token, jwtExpirationMs / 1000);
+        return ResponseEntity.ok()
+            .header(HttpHeaders.SET_COOKIE, cookie.toString())
+            .build();
+    }
+
+    @PostMapping(path = "/auth/logout")
+    public ResponseEntity<Void> logout() {
+        ResponseCookie cookie = tokenCookie("", 0);
+        return ResponseEntity.noContent()
+            .header(HttpHeaders.SET_COOKIE, cookie.toString())
+            .build();
+    }
+
+    private ResponseCookie tokenCookie(String value, long maxAgeSeconds) {
+        return ResponseCookie.from("token", value)
             .httpOnly(true)
             .secure(false) //change when going prod
             .sameSite("Strict")
             .path("/")
-            .maxAge(jwtExpirationMs / 1000)
-            .build();
-        return ResponseEntity.ok()
-            .header(HttpHeaders.SET_COOKIE, cookie.toString())
+            .maxAge(maxAgeSeconds)
             .build();
     }
 

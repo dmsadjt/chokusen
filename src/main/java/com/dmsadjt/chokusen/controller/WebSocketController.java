@@ -56,6 +56,7 @@ public class WebSocketController {
             saved.getMessageId(),
             channelId,
             user.getUserId(),
+            user.getUsername(),
             saved.getMessageContent(),
             saved.getCreatedAt()
         );

@@ -14,6 +14,7 @@ public class MessageResponse {
     private UUID messageId;
     private UUID channelId;
     private UUID senderId;
+    private String senderUsername;
     private String content;
     private LocalDateTime sentAt;
 }

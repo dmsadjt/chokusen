@@ -40,6 +40,7 @@ public class MessageController {
             message.getMessageId(),
             message.getChannel().getChannelId(),
             message.getUser().getUserId(),
+            message.getUser().getUsername(),
             message.getMessageContent(),
             message.getCreatedAt()
         );

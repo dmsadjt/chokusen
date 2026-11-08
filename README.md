@@ -201,11 +201,20 @@ Returns `{ userId, username, email }` for the authenticated user.
 | PUT | `/api/v1/channels/{channelId}/messages/{messageId}` | Edit a message |
 | DELETE | `/api/v1/channels/{channelId}/messages/{messageId}` | Delete a message |
 
+### Read state
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/v1/workspaces/{workspaceId}/unread` | Unread message count per channel for the authenticated user |
+| GET | `/api/v1/channels/{channelId}/reads` | When each user last read the channel |
+| POST | `/api/v1/channels/{channelId}/read` | Mark the channel as read now; also broadcasts a receipt to `/topic/channel.{channelId}.reads` |
+
 ## Data Model
 
 ```
 User ──< WorkspaceMember >── Workspace ──< Channel ──< Message
 User ──< ChannelMember   >── Channel
+User ──< ChannelReadState >── Channel   (last-read time per user and channel)
 ```
 
 - All primary keys are UUIDs.
@@ -223,3 +232,21 @@ src/main/java/com/dmsadjt/chokusen/
 ├── dto/             # Request/response DTOs
 └── security/        # JWT utilities, filters, Spring Security config
 ```
+
+## Known Limitations
+
+This is a basic first version. These gaps are known and deliberately deferred:
+
+**Security**
+- **No membership checks.** Any logged-in user can read any channel's messages, subscribe to any channel's live topic, send to any channel, invite people into any workspace, edit or delete any message, and list all users, workspaces and channels.
+- **Logout does not revoke the token.** It only clears the cookie. The JWT stays valid until it expires (24 hours). The usual fix is a short-lived access token plus a rotating, server-stored refresh token, or server-side sessions.
+- **CORS and cookie settings are development defaults.** CORS allows any origin with credentials, the cookie is not marked `Secure`, and Spring Security logs at `DEBUG`.
+
+**Reliability**
+- **WebSocket recovery is minimal.** After a reconnect, messages sent in the gap are not re-fetched. A failed send shows no error, and an unauthenticated connection retries every 3 seconds indefinitely.
+- **The message broker is in memory.** Live updates only reach clients connected to the same backend instance, and nothing is retained for offline clients (they catch up from the database).
+
+**Product**
+- Inviting a workspace member adds them immediately. There is no pending invite or accept step.
+- Invited members are not added to the workspace's channels automatically.
+- A channel you have never opened counts its entire history as unread.
