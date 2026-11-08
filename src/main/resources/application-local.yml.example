@@ -1,0 +1,9 @@
+# Copy to application-local.yml (gitignored) and fill in your own values.
+# In any other environment, set DB_PASSWORD and JWT_SECRET env vars instead.
+spring:
+  datasource:
+    password: <your-db-password>
+app:
+  jwt:
+    # at least 32 characters, e.g. `openssl rand -base64 48`
+    secret: <random-secret>

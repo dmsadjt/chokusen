@@ -43,13 +43,17 @@ A real-time collaborative messaging API built with Spring Boot. Organize convers
    cd chokusen
    ```
 
-   Open `src/main/resources/application.properties` and set your values:
-   ```properties
-   spring.datasource.url=jdbc:postgresql://localhost:5432/chokusen
-   spring.datasource.username=<your-db-user>
-   spring.datasource.password=<your-db-password>
-   jwt.secret=<your-secret-key>
+   Copy `src/main/resources/application-local.yml.example` to `application-local.yml` (gitignored) and fill in your values:
+   ```yaml
+   spring:
+     datasource:
+       password: <your-db-password>
+   app:
+     jwt:
+       secret: <random-secret-at-least-32-characters>
    ```
+
+   In any other environment, set the `DB_PASSWORD` and `JWT_SECRET` environment variables instead (`DB_URL` and `DB_USERNAME` are optional). The app refuses to start without them.
 
 4. **Run the application**
    ```bash
@@ -85,13 +89,17 @@ A real-time collaborative messaging API built with Spring Boot. Organize convers
    cd chokusen
    ```
 
-   Open `src/main/resources/application.properties` and set your values:
-   ```properties
-   spring.datasource.url=jdbc:postgresql://localhost:5432/chokusen
-   spring.datasource.username=<your-db-user>
-   spring.datasource.password=<your-db-password>
-   jwt.secret=<your-secret-key>
+   Copy `src/main/resources/application-local.yml.example` to `application-local.yml` (gitignored) and fill in your values:
+   ```yaml
+   spring:
+     datasource:
+       password: <your-db-password>
+   app:
+     jwt:
+       secret: <random-secret-at-least-32-characters>
    ```
+
+   In any other environment, set the `DB_PASSWORD` and `JWT_SECRET` environment variables instead (`DB_URL` and `DB_USERNAME` are optional). The app refuses to start without them.
 
 4. **Run the application**
    ```powershell
@@ -101,6 +109,10 @@ A real-time collaborative messaging API built with Spring Boot. Organize convers
    The API will be available at `http://localhost:8080`.
 
 Hibernate will auto-create/update the schema on startup (`ddl-auto=update`) on either platform.
+
+## API Documentation
+
+Swagger UI is available at `http://localhost:8080/swagger-ui/index.html` once the application is running, with the raw OpenAPI spec at `/v3/api-docs`. Both are public endpoints and don't require authentication.
 
 ## Authentication
 
@@ -136,6 +148,12 @@ Content-Type: application/json
 
 Sets an `httpOnly` cookie containing a JWT valid for 24 hours.
 
+**Current user**
+```http
+GET /api/v1/me
+```
+Returns `{ userId, username, email }` for the authenticated user.
+
 ## API Reference
 
 ### Users
@@ -152,6 +170,7 @@ Sets an `httpOnly` cookie containing a JWT valid for 24 hours.
 | Method | Endpoint | Description |
 |---|---|---|
 | GET | `/api/v1/workspaces` | List all workspaces |
+| GET | `/api/v1/workspaces/mine` | List the authenticated user's workspaces |
 | POST | `/api/v1/workspaces` | Create a workspace |
 | GET | `/api/v1/workspaces/{workspaceId}` | Get a workspace |
 | PUT | `/api/v1/workspaces/{workspaceId}` | Update a workspace |

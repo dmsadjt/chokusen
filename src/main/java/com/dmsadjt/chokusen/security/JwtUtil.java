@@ -3,6 +3,7 @@ package com.dmsadjt.chokusen.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import javax.crypto.SecretKey;
@@ -17,6 +18,15 @@ public class JwtUtil {
 
     @Value("${app.jwt.expiration}")
     private long expirationTime;
+
+    @PostConstruct
+    void validateSecret() {
+        if (secretKey.getBytes(StandardCharsets.UTF_8).length < 32) {
+            throw new IllegalStateException(
+                "app.jwt.secret must be at least 32 bytes (set JWT_SECRET)"
+            );
+        }
+    }
 
     public boolean isTokenValid(String token) {
         try {

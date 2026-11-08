@@ -1,5 +1,6 @@
 package com.dmsadjt.chokusen.service.impl;
 
+import com.dmsadjt.chokusen.exception.ResourceNotFoundException;
 import com.dmsadjt.chokusen.entity.Channel;
 import com.dmsadjt.chokusen.entity.ChannelMember;
 import com.dmsadjt.chokusen.entity.ChannelMemberId;
@@ -42,7 +43,7 @@ public class ChannelServiceImpl implements ChannelService {
     public Channel createChannelInWorkspace(UUID workspaceId, Channel channel) {
         Workspace workspace = workspaceRepository
             .findById(workspaceId)
-            .orElseThrow(() -> new RuntimeException("Workspace not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Workspace not found"));
         channel.setCreatedAt(LocalDateTime.now());
         channel.setUpdatedAt(LocalDateTime.now());
         channel.setWorkspace(workspace);
@@ -53,7 +54,7 @@ public class ChannelServiceImpl implements ChannelService {
     public Channel updateChannel(UUID id, Channel channel) {
         Channel existingChannel = channelRepository
             .findById(id)
-            .orElseThrow(() -> new RuntimeException("Channel not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Channel not found"));
         existingChannel.setChannelName(channel.getChannelName());
         existingChannel.setPrivate(channel.isPrivate());
         existingChannel.setUpdatedAt(LocalDateTime.now());
@@ -64,7 +65,7 @@ public class ChannelServiceImpl implements ChannelService {
     public void deleteChannel(UUID id) {
         Channel existingChannel = channelRepository
             .findById(id)
-            .orElseThrow(() -> new RuntimeException("Channel not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Channel not found"));
         channelRepository.delete(existingChannel);
     }
 
@@ -77,7 +78,7 @@ public class ChannelServiceImpl implements ChannelService {
     public List<Channel> getChannelsInWorkspace(UUID workspaceId) {
         Workspace workspace = workspaceRepository
             .findById(workspaceId)
-            .orElseThrow(() -> new RuntimeException("Workspace not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Workspace not found"));
         return channelRepository.findChannelByWorkspace(workspace);
     }
 
@@ -85,7 +86,7 @@ public class ChannelServiceImpl implements ChannelService {
     public List<User> getUsersInChannel(UUID channelId) {
         Channel channel = channelRepository
             .findById(channelId)
-            .orElseThrow(() -> new RuntimeException("Channel not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Channel not found"));
 
         List<ChannelMember> channelMembers =
             channelMemberRepository.findByChannel(channel);
@@ -96,10 +97,10 @@ public class ChannelServiceImpl implements ChannelService {
     public void joinChannel(UUID channelId, UUID userId) {
         Channel channel = channelRepository
             .findById(channelId)
-            .orElseThrow(() -> new RuntimeException("Channel not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Channel not found"));
         User user = userRepository
             .findById(userId)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         ChannelMemberId id = new ChannelMemberId();
         id.setChannelId(channelId);
@@ -122,7 +123,7 @@ public class ChannelServiceImpl implements ChannelService {
         ChannelMember channelMember = channelMemberRepository
             .findById(id)
             .orElseThrow(() ->
-                new RuntimeException("Channel member not found")
+                new ResourceNotFoundException("Channel member not found")
             );
         channelMemberRepository.delete(channelMember);
     }
@@ -131,6 +132,6 @@ public class ChannelServiceImpl implements ChannelService {
     public Channel getChannelById(UUID id) {
         return channelRepository
             .findById(id)
-            .orElseThrow(() -> new RuntimeException("Channel not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Channel not found"));
     }
 }

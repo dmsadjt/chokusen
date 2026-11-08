@@ -1,11 +1,14 @@
 package com.dmsadjt.chokusen.controller;
 
 import com.dmsadjt.chokusen.dto.LoginRequest;
+import com.dmsadjt.chokusen.dto.MeResponse;
 import com.dmsadjt.chokusen.dto.RegisterRequest;
+import com.dmsadjt.chokusen.dto.RegisterResponse;
 import com.dmsadjt.chokusen.entity.User;
 import com.dmsadjt.chokusen.security.AuthErrorCode;
 import com.dmsadjt.chokusen.security.JwtUtil;
 import com.dmsadjt.chokusen.service.UserService;
+import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,7 +16,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,7 +42,7 @@ public class AuthController {
 
     @PostMapping(path = "/auth/login")
     public ResponseEntity<?> login(
-        @RequestBody LoginRequest loginRequest
+        @Valid @RequestBody LoginRequest loginRequest
     ) {
         User user = userService.getUserByUsername(loginRequest.getUsername());
         if (
@@ -62,9 +67,17 @@ public class AuthController {
             .build();
     }
 
+    @GetMapping(path = "/me")
+    public ResponseEntity<MeResponse> me(Authentication authentication) {
+        User user = userService.getUserByUsername(authentication.getName());
+        return ResponseEntity.ok(
+            new MeResponse(user.getUserId(), user.getUsername(), user.getEmail())
+        );
+    }
+
     @PostMapping(path = "/auth/register")
-    public ResponseEntity<User> register(
-        @RequestBody RegisterRequest registerRequest
+    public ResponseEntity<RegisterResponse> register(
+        @Valid @RequestBody RegisterRequest registerRequest
     ) {
         User newUser = new User();
         newUser.setUsername(registerRequest.getUsername());
@@ -74,6 +87,13 @@ public class AuthController {
             passwordEncoder.encode(registerRequest.getPassword())
         );
         User createdUser = userService.createUser(newUser);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+            new RegisterResponse(
+                createdUser.getUserId(),
+                createdUser.getUsername(),
+                createdUser.getEmail(),
+                createdUser.getCreatedAt()
+            )
+        );
     }
 }

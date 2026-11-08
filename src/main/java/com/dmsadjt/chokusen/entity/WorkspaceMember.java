@@ -18,6 +18,9 @@ import lombok.Setter;
 @NoArgsConstructor
 public class WorkspaceMember {
 
+    public static final String ROLE_OWNER = "owner";
+    public static final String ROLE_MEMBER = "member";
+
     @EmbeddedId
     private WorkspaceMemberId id;
 

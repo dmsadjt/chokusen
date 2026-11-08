@@ -1,6 +1,5 @@
 package com.dmsadjt.chokusen.dto;
 
-import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,6 +7,5 @@ import lombok.Setter;
 @Setter
 public class AddMemberRequest {
 
-    private UUID userId;
-    private String role;
+    private String username;
 }

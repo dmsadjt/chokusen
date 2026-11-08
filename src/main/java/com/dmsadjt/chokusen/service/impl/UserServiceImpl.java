@@ -1,5 +1,7 @@
 package com.dmsadjt.chokusen.service.impl;
 
+import com.dmsadjt.chokusen.exception.DuplicateResourceException;
+import com.dmsadjt.chokusen.exception.ResourceNotFoundException;
 import com.dmsadjt.chokusen.entity.User;
 import com.dmsadjt.chokusen.repository.UserRepository;
 import com.dmsadjt.chokusen.service.UserService;
@@ -23,17 +25,26 @@ public class UserServiceImpl implements UserService {
     public User getUserById(UUID id) {
         return userRepository
             .findById(id)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
     @Override
     public void updateUser(UUID userId, User user) {
         User existingUser = userRepository
             .findById(userId)
-            .orElseThrow(() -> new RuntimeException("User not found"));
-        existingUser.setEmail(user.getEmail());
-        existingUser.setPassword(user.getPassword());
-        existingUser.setUsername(user.getUsername());
+            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        if (
+            user.getEmail() != null &&
+            !user.getEmail().equals(existingUser.getEmail())
+        ) {
+            if (userRepository.findByEmail(user.getEmail()) != null) {
+                throw new DuplicateResourceException("Email already registered");
+            }
+            existingUser.setEmail(user.getEmail());
+        }
+        if (user.getPassword() != null) {
+            existingUser.setPassword(user.getPassword());
+        }
         userRepository.save(existingUser);
     }
 
@@ -44,6 +55,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User createUser(User user) {
+        if (userRepository.findByUsername(user.getUsername()) != null) {
+            throw new DuplicateResourceException("Username already taken");
+        }
+        if (userRepository.findByEmail(user.getEmail()) != null) {
+            throw new DuplicateResourceException("Email already registered");
+        }
         return userRepository.save(user);
     }
 

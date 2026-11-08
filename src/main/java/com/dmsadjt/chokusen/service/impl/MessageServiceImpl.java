@@ -1,5 +1,6 @@
 package com.dmsadjt.chokusen.service.impl;
 
+import com.dmsadjt.chokusen.exception.ResourceNotFoundException;
 import com.dmsadjt.chokusen.entity.Channel;
 import com.dmsadjt.chokusen.entity.Message;
 import com.dmsadjt.chokusen.repository.ChannelRepository;
@@ -29,7 +30,7 @@ public class MessageServiceImpl implements MessageService {
     public Message editMessage(UUID id, Message message) {
         Message existingMessage = messageRepository
             .findById(id)
-            .orElseThrow(() -> new RuntimeException("Message not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Message not found"));
         existingMessage.setMessageContent(message.getMessageContent());
         existingMessage.setUpdatedAt(LocalDateTime.now());
         return messageRepository.save(existingMessage);
@@ -44,7 +45,7 @@ public class MessageServiceImpl implements MessageService {
     public List<Message> getMessagesInChannel(UUID channelId) {
         Channel channel = channelRepository
             .findById(channelId)
-            .orElseThrow(() -> new RuntimeException("Channel not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Channel not found"));
         return messageRepository.findByChannel(channel);
     }
 }

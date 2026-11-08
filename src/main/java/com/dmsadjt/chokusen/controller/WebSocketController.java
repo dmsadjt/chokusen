@@ -8,6 +8,7 @@ import com.dmsadjt.chokusen.entity.User;
 import com.dmsadjt.chokusen.service.ChannelService;
 import com.dmsadjt.chokusen.service.MessageService;
 import com.dmsadjt.chokusen.service.UserService;
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +35,13 @@ public class WebSocketController {
     @MessageMapping("/chat.send/{channelId}")
     public void sendMessage(
         @DestinationVariable UUID channelId,
-        SendMessageRequest request
+        SendMessageRequest request,
+        Principal principal
     ) {
-        User user = userService.getUserById(request.getSenderId());
+        User user = userService.getUserByUsername(principal.getName());
+        if (user == null) {
+            return;
+        }
         Channel channel = channelService.getChannelById(channelId);
 
         Message message = new Message();

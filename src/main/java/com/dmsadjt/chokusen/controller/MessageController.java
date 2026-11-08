@@ -1,9 +1,11 @@
 package com.dmsadjt.chokusen.controller;
 
+import com.dmsadjt.chokusen.dto.MessageResponse;
 import com.dmsadjt.chokusen.entity.Message;
 import com.dmsadjt.chokusen.service.MessageService;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,11 +24,24 @@ public class MessageController {
     private MessageService messageService;
 
     @GetMapping(path = "/channels/{channelId}/messages")
-    public ResponseEntity<List<Message>> getAllMessages(
+    public ResponseEntity<List<MessageResponse>> getAllMessages(
         @PathVariable UUID channelId
     ) {
         return ResponseEntity.ok(
             messageService.getMessagesInChannel(channelId)
+                .stream()
+                .map(MessageController::toResponse)
+                .collect(Collectors.toList())
+        );
+    }
+
+    private static MessageResponse toResponse(Message message) {
+        return new MessageResponse(
+            message.getMessageId(),
+            message.getChannel().getChannelId(),
+            message.getUser().getUserId(),
+            message.getMessageContent(),
+            message.getCreatedAt()
         );
     }
 

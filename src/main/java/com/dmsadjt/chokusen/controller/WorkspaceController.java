@@ -3,6 +3,8 @@ package com.dmsadjt.chokusen.controller;
 import com.dmsadjt.chokusen.dto.AddMemberRequest;
 import com.dmsadjt.chokusen.entity.User;
 import com.dmsadjt.chokusen.entity.Workspace;
+import com.dmsadjt.chokusen.entity.WorkspaceMember;
+import com.dmsadjt.chokusen.service.UserService;
 import com.dmsadjt.chokusen.service.WorkspaceService;
 import java.util.List;
 import java.util.UUID;
@@ -26,6 +28,9 @@ public class WorkspaceController {
 
     @Autowired
     private WorkspaceService workspaceService;
+
+    @Autowired
+    private UserService userService;
 
     @GetMapping(path = "/workspaces")
     public ResponseEntity<List<Workspace>> getAllWorkspaces() {
@@ -60,15 +65,19 @@ public class WorkspaceController {
         );
     }
 
-
-
     @PostMapping(path = "/workspaces")
     public ResponseEntity<Workspace> createWorkspace(
-        @RequestBody Workspace workspace
+        @RequestBody Workspace workspace,
+        Authentication authentication
     ) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-            workspaceService.createWorkspace(workspace)
+        Workspace createdWorkspace = workspaceService.createWorkspace(workspace);
+        User creator = userService.getUserByUsername(authentication.getName());
+        workspaceService.addUserToWorkspace(
+            createdWorkspace.getWorkspaceId(),
+            creator.getUserId(),
+            WorkspaceMember.ROLE_OWNER
         );
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdWorkspace);
     }
 
     @PostMapping(path = "/workspaces/{workspaceId}/members")
@@ -76,10 +85,14 @@ public class WorkspaceController {
         @PathVariable UUID workspaceId,
         @RequestBody AddMemberRequest request
     ) {
+        User invitee = userService.getUserByUsername(request.getUsername());
+        if (invitee == null) {
+            return ResponseEntity.notFound().build();
+        }
         workspaceService.addUserToWorkspace(
             workspaceId,
-            request.getUserId(),
-            request.getRole()
+            invitee.getUserId(),
+            WorkspaceMember.ROLE_MEMBER
         );
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

@@ -1,5 +1,6 @@
 package com.dmsadjt.chokusen.service.impl;
 
+import com.dmsadjt.chokusen.exception.ResourceNotFoundException;
 import com.dmsadjt.chokusen.entity.User;
 import com.dmsadjt.chokusen.entity.Workspace;
 import com.dmsadjt.chokusen.entity.WorkspaceMember;
@@ -36,7 +37,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     public Workspace getWorkspaceById(UUID id) {
         return workspaceRepository
             .findById(id)
-            .orElseThrow(() -> new RuntimeException("Workspace not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Workspace not found"));
     }
 
     @Override
@@ -50,7 +51,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     public Workspace updateWorkspace(UUID id, Workspace workspace) {
         Workspace existingWorkspace = workspaceRepository
             .findById(id)
-            .orElseThrow(() -> new RuntimeException("Workspace not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Workspace not found"));
 
         existingWorkspace.setWorkspaceName(workspace.getWorkspaceName());
         existingWorkspace.setUpdatedAt(LocalDateTime.now());
@@ -66,7 +67,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     public List<User> getUsersInWorkspace(UUID workspaceId) {
         Workspace workspace = workspaceRepository
             .findById(workspaceId)
-            .orElseThrow(() -> new RuntimeException("Workspace not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Workspace not found"));
 
         List<WorkspaceMember> members =
             workspaceMemberRepository.findByWorkspace(workspace);
@@ -89,11 +90,11 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     ) {
         Workspace workspace = workspaceRepository
             .findById(workspaceId)
-            .orElseThrow(() -> new RuntimeException("Workspace not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Workspace not found"));
 
         User user = userRepository
             .findById(userId)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         WorkspaceMemberId id = new WorkspaceMemberId();
         id.setWorkspaceId(workspaceId);
@@ -132,7 +133,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
         WorkspaceMember member = workspaceMemberRepository
             .findById(id)
-            .orElseThrow(() -> new RuntimeException("Member not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Member not found"));
         return member;
     }
 }
